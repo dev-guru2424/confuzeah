@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CONFUZEAH</title>
+<style>
+  :root {
+    --title-color: #111;
+    --caret-color: #111;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    z-index: 5;
+  }
+  button {
+    padding: 10px 14px;
+    font-size: 18px;
+    background: black;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: #666; }
+  .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+  #showImage {
+    display: none;
+    width: 600px;
+    height: 800px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  }
+  #timer {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: 700;
+    background: black;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    display: none;
+    z-index: 6;
+  }
+  #title {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    z-index: 6;
+    pointer-events: none;
+  }
+  .letter-wrap {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+  }
+
+  .caret {
+    font-size: 18px;
+    line-height: 1;
+    transform: translateY(-6px);
+    color: var(--caret-color);
+    opacity: 0;
+    animation: caretIn 0.28s ease forwards;
+  }
+
+  .letter {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--title-color);
+    letter-spacing: 2px;
+    opacity: 0;
+    transform: translateY(-12px);
+    display: inline-block;
+    animation: letterIn 0.38s cubic-bezier(.2,.9,.2,1) forwards;
+  }
+
+  @keyframes letterIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes caretIn {
+    from { opacity: 0; transform: translateY(-12px) scale(0.9); }
+    to { opacity: 1; transform: translateY(-6px) scale(1); }
+  }
+
+  @media (max-width:800px){
+    .letter{ font-size:32px; }
+    .caret{ font-size:14px; transform:translateY(-4px); }
+  }
+</style>
+</head>
+<body>
+<div id="timer">30</div>
+<div class="side" id="leftSide">
+  <button onclick="showImage('Q1')">M1</button>
+  <button onclick="showImage('Q2')">M2</button>
+  <button onclick="showImage('Q3')">M3</button>
+  <button onclick="showImage('Q4')">M4</button>
+  <button onclick="showImage('Q5')">M5</button>
+  <button onclick="showImage('Q6')">M6</button>
+  <button onclick="showImage('Q7')">M7</button>
+  <button onclick="showImage('Q8')">M8</button>
+</div>
+<div class="center">
+  <img id="showImage" src="" alt="Display">
+</div>
+<h1 id="title"></h1>
+<div class="side" id="rightSide">
+  <button onclick="showImage('QTN1')">Q1</button>
+  <button onclick="showImage('QTN2')">Q2</button>
+  <button onclick="showImage('QTN3')">Q3</button>
+  <button onclick="showImage('QTN4')">Q4</button>
+  <button onclick="showImage('QTN5')">Q5</button>
+  <button onclick="showImage('QTN6')">Q6</button>
+  <button onclick="showImage('QTN7')">Q7</button>
+  <button onclick="showImage('QTN8')">Q8</button>
+</div>
+<script>
+let timerInterval = null;
+function createTitle() {
+  const titleText = "< C O N F U Z E A H >";
+  const container = document.getElementById('title');
+  container.innerHTML = "";
+  titleText.split('').forEach((ch, i) => {
+    const wrap = document.createElement('span');
+    wrap.className = 'letter-wrap';
+    const caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.textContent = ' ';
+    caret.style.animationDelay = (i * 0.18) + 's';
+    wrap.appendChild(caret);
+    const letter = document.createElement('span');
+    letter.className = 'letter';
+    letter.textContent = ch;
+    letter.style.animationDelay = ((i * 0.18) + 0.08) + 's';
+    wrap.appendChild(letter);
+    container.appendChild(wrap);
+  });
+}
+function showImage(name){
+  const img = document.getElementById('showImage');
+  const timer = document.getElementById('timer');
+  const title = document.getElementById('title');
+  title.style.display = 'none';
+  clearInterval(timerInterval);
+  let timeLeft = 30;
+  img.src = name + '.jpg';
+  img.style.display = 'block';
+  timer.style.display = 'block';
+  timer.textContent = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timer.textContent = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      img.style.display = 'none';
+      timer.textContent = '00';
+      timer.style.display = 'none';
+      title.style.display = 'flex';
+      createTitle();
+    }
+  }, 1000);
+}
+createTitle();
+</script>
+</body>
+</html>
